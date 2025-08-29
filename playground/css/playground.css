@@ -31,8 +31,16 @@ body {
     background-color: var(--c-100);
     color: var(--c-900);
 
+    .loading-message {
+        display: none;
+    }
+
     &.loading {
-        >* {
+        .loading-message {
+            display: block;
+        }
+
+        > :not(.loading-message) {
             visibility: hidden;
         }
     }

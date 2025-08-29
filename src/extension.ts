@@ -8,7 +8,7 @@ import * as fs from 'fs';
 function getZeal8bitConfig() {
   const config = vscode.workspace.getConfiguration('zeal8bit');
   return {
-    uses: config.get<string>('uses', ''),
+    uses: config.get<string>('uses', 'zealos'),
   };
 }
 
@@ -225,174 +225,38 @@ class ZealPreviewPanel {
 
   private _update() {
     const webview = this._panel.webview;
-    this._panel.webview.html = this._getHtmlForWebview(webview);
+    this._panel.webview.html = this._getHtmlForWebview(webview, this._extensionUri);
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview) {
+  private _getHtmlForWebview(webview: vscode.Webview, extensionUri: vscode.Uri) {
     // Get URIs for all the resources
-    const playgroundJs = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'playground', 'js', 'playground.js'),
-    );
-    const emulatorJs = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'playground', 'js', 'emulator.js'));
-    const playgroundCss = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'playground', 'css', 'playground.css'),
-    );
-    const emulatorCss = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'playground', 'css', 'emulator.css'),
-    );
+    const paths: Record<string, vscode.Uri> = {
+      playgroundJs: vscode.Uri.joinPath(extensionUri, 'playground', 'js', 'playground.js'),
+      vscodeJs: vscode.Uri.joinPath(extensionUri, 'playground', 'js', 'vscode.js'),
+      emulatorJs: vscode.Uri.joinPath(extensionUri, 'playground', 'js', 'emulator.js'),
+      playgroundCss: vscode.Uri.joinPath(extensionUri, 'playground', 'css', 'playground.css'),
+      emulatorCss: vscode.Uri.joinPath(extensionUri, 'playground', 'css', 'emulator.css'),
+      // WASM files
+      zealElfJs: vscode.Uri.joinPath(extensionUri, 'playground', 'wasm', 'native', 'zeal.elf.js'),
+    };
 
-    // WASM files
-    const zealElfJs = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'playground', 'wasm', 'native', 'zeal.elf.js'),
-    );
+    const htmlPath = path.join(extensionUri.fsPath, 'playground', 'index.html');
+    let html = fs.readFileSync(htmlPath, 'utf8');
 
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zeal 8-bit Preview</title>
-    <link rel="stylesheet" href="${playgroundCss}">
-    <link rel="stylesheet" href="${emulatorCss}">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--vscode-editor-background);
-            color: var(--vscode-editor-foreground);
-            font-family: var(--vscode-font-family);
-        }
-        .loading-message {
-            text-align: center;
-            padding: 20px;
-            font-family: var(--vscode-font-family);
-            color: var(--vscode-foreground);
-        }
+    const replaceAssetPath = (src: string) => {
+      const replacement = paths[src];
+      return webview.asWebviewUri(replacement).toString();
+    };
 
-    </style>
-</head>
-<body class="loading">
-    <div class="loading-message">
-        <h2>Zeal 8-bit Emulator Preview</h2>
-        <p>Waiting for binary to load...</p>
-    </div>
+    html = html.replace(/<script\s+src="\$\{(.+?)\}"><\/script>/g, (match, src) => {
+      return `<script src="${replaceAssetPath(src)}"></script>`;
+    });
 
-    <div id="viewport" style="display: none;">
-        <div id="emulator">
-            <div id="canvas-container">
-                <canvas id="canvas" tabindex="0" width="640" height="480"></canvas>
-            </div>
-            <div class="controls border-t border-b margin-t hidden">
-                <button class="btn toggle-fps">Toggle FPS</button>
-                <button class="btn code-stop" onclick="code_stop()">
-                    <span>■</span> Stop
-                </button>
-            </div>
-            <div class="output margin-t hidden"></div>
-        </div>
-        <div id="assembler" class="scrollbars">
-            <div class="log" id="log">Ready to load binary...</div>
-            <pre id="hex-view">Hex view will appear here.</pre>
-        </div>
-        <div id="listing" class="scrollbars">
-            <pre id="list-view">Listing will appear here.</pre>
-        </div>
-    </div>
+    html = html.replace(/<link\s+rel="stylesheet"\s+href="\$\{(.+?)\}"\s*\/?>/g, (match, href) => {
+      return `<link rel="stylesheet" href="${replaceAssetPath(href)}" />`;
+    });
 
-    <script>
-        // VS Code API - must be first script
-        const vscode = acquireVsCodeApi();
-
-        // Override the original playground.js DOMContentLoaded behavior
-        let originalCode_run;
-
-        // Listen for messages from the extension
-        window.addEventListener('message', event => {
-            const message = event.data;
-            switch (message.command) {
-                case 'loadBinary':
-                    loadBinaryFromBase64(message.data, message.fileName, message.config);
-                    break;
-                case 'updateConfig':
-                    updateConfiguration(message.config);
-                    break;
-            }
-        });
-
-        function updateConfiguration(config) {
-            console.log('Configuration updated:', config);
-            // Store config globally for use in other functions
-            window.zeal8bitConfig = config;
-
-            // You can add logic here to respond to configuration changes
-            // For example, update UI elements based on the 'uses' property
-            if (config.uses) {
-                console.log('Project uses:', config.uses);
-                // Example: Update a status display or modify behavior based on the 'uses' property
-            }
-        }
-
-        function loadBinaryFromBase64(base64Data, fileName, config) {
-            try {
-                const listing = document.querySelector('#list-view');
-                listing.textContent = '';
-
-                // Store config for use throughout the webview
-                if (config) {
-                    updateConfiguration(config);
-                }
-
-                // Convert base64 to Uint8Array
-                const binaryString = atob(base64Data);
-                const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0));
-
-                let listing_text = '';
-                listing_text += "base64: " + base64Data;
-
-                // Include configuration info in the listing
-                if (config && config.uses) {
-                    listing_text += "\\nProject uses: " + config.uses;
-                }
-
-                // Show the emulator and hide loading message
-                document.getElementById('viewport').style.display = 'block';
-                document.querySelector('.loading-message').style.display = 'none';
-                document.body.classList.remove('loading');
-
-                // Load the binary into the emulator
-                if (typeof code_run === 'function') {
-                    listing_text += "\\ncode_run available";
-                    code_run(bytes);
-                } else {
-                    // If code_run isn't available yet, wait a bit and try again
-                  listing_text += "\\ncode_run unavailable";
-                    setTimeout(() => {
-                        if (typeof code_run === 'function') {
-                            listing_text += "\\ncode_run available";
-                            code_run(bytes);
-                        }
-                    }, 100);
-                }
-
-                listing_text += "\\nuses: " + (window.zeal8bitConfig?.uses || "bare");
-
-                console.log('Loaded binary:', fileName, bytes.length, 'bytes');
-
-                listing.textContent = listing_text;
-            } catch (error) {
-                console.error('Failed to load binary:', error);
-            }
-        }
-
-        // Flag to indicate we're in VS Code extension context
-        window.IS_VSCODE_EXTENSION = true;
-    </script>
-
-    <script src="${playgroundJs}"></script>
-    <script src="${emulatorJs}"></script>
-    <script src="${zealElfJs}"></script>
-</body>
-</html>`;
+    return html;
   }
 }
 

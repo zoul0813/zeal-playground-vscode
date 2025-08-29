@@ -65,9 +65,13 @@
 
     output.innerHTML = '';
     const fileName = 'program.bin';
-    let loadArg = '-r';
+    let loadArg = '-u';
     switch (window.zeal8bitConfig?.uses) {
+      case 'bare':
+        loadArg = '-r';
+        break;
       case 'zealos':
+      default:
         loadArg = '-u';
         break;
     }
