@@ -55,6 +55,17 @@
           "when": "false"
         }
       ]
+    },
+    "configuration": {
+      "title": "Zeal 8-bit",
+      "properties": {
+        "zeal8bit.uses": {
+          "type": "string",
+          "default": "",
+          "description": "Custom property to define what the project uses. Can be used for project-specific settings.",
+          "scope": "resource"
+        }
+      }
     }
   },
   "scripts": {

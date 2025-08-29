@@ -21,8 +21,5 @@
     "editor.foldingStrategy": "indentation",
     "editor.detectIndentation": false,
     "editor.tabSize": 2
-  },
-  "[z80-macroasm]": {
-    "files.insertFinalNewline": true
   }
 }

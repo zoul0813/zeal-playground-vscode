@@ -1,16 +1,6 @@
 (() => {
   /* WebASM related */
   const emulator = document.getElementById('emulator');
-  let uses;
-  Object.defineProperty(emulator, 'uses', {
-    get() {
-      return uses;
-    },
-    set(v) {
-      uses = v;
-      // enableZealOS.checked = uses == 'zealos';
-    },
-  });
 
   const controls = emulator.querySelector('.controls');
   const output = emulator.querySelector('.output');
@@ -61,10 +51,6 @@
     };
   }
 
-  // enableZealOS.addEventListener('change', (e) => {
-  //   uses = e.target.checked ? 'zealos' : '';
-  // });
-
   emulator.reload = (data) => {
     console.log('reloadEmulator', data);
 
@@ -78,15 +64,17 @@
     }
 
     output.innerHTML = '';
-    const fileName = editor.fileName.split('/').slice(-1).join('').split('.').slice(0, -1).join('.') + '.bin';
+    const fileName = 'program.bin';
     let loadArg = '-r';
-    switch (uses) {
+    switch (window.zeal8bitConfig?.uses) {
       case 'zealos':
         loadArg = '-u';
         break;
     }
+    const arguments = [loadArg, `/user/${fileName}`];
+    console.log('emulator args', arguments);
     const defaultModule = {
-      arguments: [loadArg, `/user/${fileName}`],
+      arguments,
       print: log('info'),
       printErr: log('error'),
       get canvas() {

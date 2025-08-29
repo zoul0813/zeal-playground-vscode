@@ -7,23 +7,14 @@
     display: flex;
 
     padding: 24px;
-    grid-column: span 3;
-
-    @media (min-width: 600px) {
-        padding: 48px;
-    }
-
-    @media (min-width: 1024px) {
-        padding: var(--row-gap) var(--col-gap);
-        grid-column: span 1;
-    }
 
     flex-direction: column;
 
     canvas {
         background-color: black;
-        aspect-ratio: 1.33333333;
         width: 100%;
+        aspect-ratio: 4 / 3;
+        display: block;
     }
 
     .output {

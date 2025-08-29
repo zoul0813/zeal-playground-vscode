@@ -78,12 +78,6 @@ icon {
 
 #assembler,
 #listing {
-    grid-column: span 3;
-
-    @media (min-width: 1024px) {
-        grid-column: span 1;
-    }
-
     background: var(--c-0);
     padding: 0.5rem;
     font-family: monospace;

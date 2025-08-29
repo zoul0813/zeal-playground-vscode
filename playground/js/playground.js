@@ -63,3 +63,28 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('ERROR', e);
     });
 });
+
+function resizeCanvas() {
+  const canvas = document.getElementById('canvas-container');
+  const vw = window.innerWidth - 48;
+  const vh = window.innerHeight - 48;
+  const aspect = 4 / 3;
+
+  let width = vw;
+  let height = width / aspect;
+
+  if (height > vh) {
+    height = vh;
+    width = height * aspect;
+  }
+
+  canvas.style.width = width + 'px';
+  canvas.style.height = height + 'px';
+
+  // also fix internal resolution for crisp drawing
+  canvas.width = width;
+  canvas.height = height;
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();

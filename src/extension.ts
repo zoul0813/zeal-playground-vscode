@@ -2,8 +2,35 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
+/**
+ * Get the project-level configuration for Zeal 8-bit
+ */
+function getZeal8bitConfig() {
+  const config = vscode.workspace.getConfiguration('zeal8bit');
+  return {
+    uses: config.get<string>('uses', ''),
+  };
+}
+
 export function activate(context: vscode.ExtensionContext) {
   console.log('Zeal 8-bit Preview extension is now active!');
+
+  // Log current configuration
+  const config = getZeal8bitConfig();
+  console.log('Zeal 8-bit configuration:', config);
+
+  // Listen for configuration changes
+  const configChangeListener = vscode.workspace.onDidChangeConfiguration((e) => {
+    if (e.affectsConfiguration('zeal8bit')) {
+      const newConfig = getZeal8bitConfig();
+      console.log('Zeal 8-bit configuration changed:', newConfig);
+
+      // Update the current panel's configuration if it exists
+      if (ZealPreviewPanel.currentPanel) {
+        ZealPreviewPanel.currentPanel.updateConfig();
+      }
+    }
+  });
 
   // Register command to open preview
   const openPreviewCommand = vscode.commands.registerCommand('zeal8bit.openPreview', () => {
@@ -32,7 +59,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  context.subscriptions.push(openPreviewCommand, loadBinaryCommand, taskEndListener);
+  context.subscriptions.push(openPreviewCommand, loadBinaryCommand, taskEndListener, configChangeListener);
 }
 
 async function handleBuildTaskComplete(task: vscode.Task) {
@@ -112,12 +139,15 @@ class ZealPreviewPanel {
   private readonly _panel: vscode.WebviewPanel;
   private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
+  private _config: ReturnType<typeof getZeal8bitConfig>;
 
   public static createOrShow(extensionUri: vscode.Uri) {
     const column = vscode.window.activeTextEditor ? vscode.ViewColumn.Beside : undefined;
 
     if (ZealPreviewPanel.currentPanel) {
       ZealPreviewPanel.currentPanel._panel.reveal(column);
+      // Update configuration in existing panel
+      ZealPreviewPanel.currentPanel._config = getZeal8bitConfig();
       return;
     }
 
@@ -128,9 +158,9 @@ class ZealPreviewPanel {
       {
         enableScripts: true,
         localResourceRoots: [
-          vscode.Uri.joinPath(extensionUri, 'js'),
-          vscode.Uri.joinPath(extensionUri, 'css'),
-          vscode.Uri.joinPath(extensionUri, 'wasm'),
+          vscode.Uri.joinPath(extensionUri, 'playground', 'js'),
+          vscode.Uri.joinPath(extensionUri, 'playground', 'css'),
+          vscode.Uri.joinPath(extensionUri, 'playground', 'wasm'),
         ],
       },
     );
@@ -141,6 +171,9 @@ class ZealPreviewPanel {
   private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
     this._panel = panel;
     this._extensionUri = extensionUri;
+    this._config = getZeal8bitConfig();
+
+    console.log('ZealPreviewPanel created with config:', this._config);
 
     this._update();
 
@@ -156,12 +189,24 @@ class ZealPreviewPanel {
         command: 'loadBinary',
         data: base64Data,
         fileName: path.basename(binaryPath),
+        config: this._config, // Include configuration in the message
       });
 
       vscode.window.showInformationMessage(`Loaded ${path.basename(binaryPath)} into Zeal 8-bit Preview`);
     } catch (error) {
       vscode.window.showErrorMessage(`Failed to load binary: ${error}`);
     }
+  }
+
+  public updateConfig() {
+    this._config = getZeal8bitConfig();
+    console.log('ZealPreviewPanel config updated:', this._config);
+
+    // Send updated config to webview
+    this._panel.webview.postMessage({
+      command: 'updateConfig',
+      config: this._config,
+    });
   }
 
   public dispose() {
@@ -184,19 +229,21 @@ class ZealPreviewPanel {
 
   private _getHtmlForWebview(webview: vscode.Webview) {
     // Get URIs for all the resources
-    const playgroundJs = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'js', 'playground.js'));
-    const emulatorJs = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'js', 'emulator.js'));
-    const assemblerJs = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'js', 'assembler.js'));
-
-    const playgroundCss = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'css', 'playground.css'));
-    const emulatorCss = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'css', 'emulator.css'));
+    const playgroundJs = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'playground', 'js', 'playground.js'),
+    );
+    const emulatorJs = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'playground', 'js', 'emulator.js'));
+    const playgroundCss = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'playground', 'css', 'playground.css'),
+    );
+    const emulatorCss = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'playground', 'css', 'emulator.css'),
+    );
 
     // WASM files
-    const zealElfJs = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'wasm', 'native', 'zeal.elf.js'));
-    const asJs = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'wasm', 'gnu-as', 'as.js'));
-    const ldJs = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'wasm', 'gnu-as', 'ld.js'));
-    const objcopyJs = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'wasm', 'gnu-as', 'objcopy.js'));
-    const toolchainJs = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'wasm', 'gnu-as', 'toolchain.js'));
+    const zealElfJs = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'playground', 'wasm', 'native', 'zeal.elf.js'),
+    );
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -230,7 +277,7 @@ class ZealPreviewPanel {
     </div>
 
     <div id="viewport" style="display: none;">
-        <div id="emulator" class="padding scrollbars">
+        <div id="emulator">
             <div id="canvas-container">
                 <canvas id="canvas" tabindex="0" width="640" height="480"></canvas>
             </div>
@@ -254,46 +301,63 @@ class ZealPreviewPanel {
     <script>
         // VS Code API - must be first script
         const vscode = acquireVsCodeApi();
-        
+
         // Override the original playground.js DOMContentLoaded behavior
         let originalCode_run;
-        
+
         // Listen for messages from the extension
         window.addEventListener('message', event => {
             const message = event.data;
             switch (message.command) {
                 case 'loadBinary':
-                    loadBinaryFromBase64(message.data, message.fileName);
+                    loadBinaryFromBase64(message.data, message.fileName, message.config);
+                    break;
+                case 'updateConfig':
+                    updateConfiguration(message.config);
                     break;
             }
         });
 
-        function loadBinaryFromBase64(base64Data, fileName) {
+        function updateConfiguration(config) {
+            console.log('Configuration updated:', config);
+            // Store config globally for use in other functions
+            window.zeal8bitConfig = config;
+
+            // You can add logic here to respond to configuration changes
+            // For example, update UI elements based on the 'uses' property
+            if (config.uses) {
+                console.log('Project uses:', config.uses);
+                // Example: Update a status display or modify behavior based on the 'uses' property
+            }
+        }
+
+        function loadBinaryFromBase64(base64Data, fileName, config) {
             try {
                 const listing = document.querySelector('#list-view');
                 listing.textContent = '';
 
+                // Store config for use throughout the webview
+                if (config) {
+                    updateConfiguration(config);
+                }
+
                 // Convert base64 to Uint8Array
                 const binaryString = atob(base64Data);
                 const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0));
-                
+
                 let listing_text = '';
                 listing_text += "base64: " + base64Data;
 
-                // Update editor filename
-                if (typeof editor !== 'undefined') {
-                    editor.fileName = fileName;
+                // Include configuration info in the listing
+                if (config && config.uses) {
+                    listing_text += "\\nProject uses: " + config.uses;
                 }
-                
+
                 // Show the emulator and hide loading message
                 document.getElementById('viewport').style.display = 'block';
                 document.querySelector('.loading-message').style.display = 'none';
                 document.body.classList.remove('loading');
-                
-                listing_text += "\\nfilename: " + editor.fileName;
 
-
-                
                 // Load the binary into the emulator
                 if (typeof code_run === 'function') {
                     listing_text += "\\ncode_run available";
@@ -308,7 +372,9 @@ class ZealPreviewPanel {
                         }
                     }, 100);
                 }
-                
+
+                listing_text += "\\nuses: " + (window.zeal8bitConfig?.uses || "bare");
+
                 console.log('Loaded binary:', fileName, bytes.length, 'bytes');
 
                 listing.textContent = listing_text;
@@ -316,19 +382,14 @@ class ZealPreviewPanel {
                 console.error('Failed to load binary:', error);
             }
         }
-        
+
         // Flag to indicate we're in VS Code extension context
         window.IS_VSCODE_EXTENSION = true;
     </script>
 
     <script src="${playgroundJs}"></script>
     <script src="${emulatorJs}"></script>
-    <script src="${assemblerJs}"></script>
     <script src="${zealElfJs}"></script>
-    <script src="${asJs}"></script>
-    <script src="${ldJs}"></script>
-    <script src="${objcopyJs}"></script>
-    <script src="${toolchainJs}"></script>
 </body>
 </html>`;
   }
