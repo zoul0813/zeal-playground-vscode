@@ -21,7 +21,13 @@ export function activate(context: vscode.ExtensionContext) {
   // Listen for task completion
   const taskEndListener = vscode.tasks.onDidEndTask((e: vscode.TaskEndEvent) => {
     // Check if this is a build task
-    if (e.execution.task.group === vscode.TaskGroup.Build) {
+    const taskGroup = e.execution.task.group;
+    const isBuildTask =
+      taskGroup === vscode.TaskGroup.Build ||
+      (taskGroup as any) === 'build' ||
+      (taskGroup && typeof taskGroup === 'object' && (taskGroup as any).c === 'build');
+
+    if (isBuildTask) {
       handleBuildTaskComplete(e.execution.task);
     }
   });
@@ -204,14 +210,17 @@ class ZealPreviewPanel {
         body {
             margin: 0;
             padding: 0;
-            background: #1e1e1e;
-            color: #cccccc;
+            background-color: var(--vscode-editor-background);
+            color: var(--vscode-editor-foreground);
+            font-family: var(--vscode-font-family);
         }
         .loading-message {
             text-align: center;
             padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--vscode-font-family);
+            color: var(--vscode-foreground);
         }
+
     </style>
 </head>
 <body class="loading">

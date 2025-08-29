@@ -4,14 +4,14 @@
     --row-gap: 10px;
 
     /* border color */
-    --c-border: #586e75;
+    --c-border: var(--vscode-editor-foreground, #586e75);
     /* background */
-    --c-0: #002b36;
+    --c-0: var(--vscode-panel-background, #002b36);
     /* lighter background */
-    --c-100: #073642;
-    --c-600: #657b83;
-    --c-800: #93a1a1;
-    --c-900: #eee;
+    --c-100: var(--vscode-editor-background, #073642);
+    --c-600: var(--vscode-editor-foreground, #657b83);
+    --c-800: var(--vscode-editor-foreground, #93a1a1);
+    --c-900: var(--vscode-editor-foreground, #eee);
 
     --error: #dc322f;
     --warn: #839496;
@@ -41,6 +41,7 @@ body {
 #topbar {
     line-height: 3em;
     background-color: var(--c-100);
+    color: var(--c-800);
     display: flex;
     align-items: center;
     column-gap: 12px;
@@ -48,7 +49,6 @@ body {
     font-size: 16px;
     font-weight: bold;
     height: var(--heading-h);
-    color: var(--c-800);
     border-bottom: 1px solid var(--c-border);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 
