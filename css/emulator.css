@@ -1,0 +1,44 @@
+#emulator {
+    --row-gap: 10px;
+    --col-gap: 10px;
+    height: 100%;
+    width: 100%;
+    background-color: var(--c-100);
+    display: flex;
+
+    padding: 24px;
+    grid-column: span 3;
+
+    @media (min-width: 600px) {
+        padding: 48px;
+    }
+
+    @media (min-width: 1024px) {
+        padding: var(--row-gap) var(--col-gap);
+        grid-column: span 1;
+    }
+
+    flex-direction: column;
+
+    canvas {
+        background-color: black;
+        aspect-ratio: 1.33333333;
+        width: 100%;
+    }
+
+    .output {
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        row-gap: 0.25rem;
+        font-family: monospace;
+
+        .error {
+            color: var(--error);
+        }
+
+        .warn {
+            color: var(--warn);
+        }
+    }
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Zeal 8-bit Playground</title>
+    <link rel="icon" href="imgs/zeal.png" sizes="16x16" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Playground -->
+    <link rel="stylesheet" href="css/playground.css" />
+    <link rel="stylesheet" href="css/emulator.css" />
+  </head>
+  <body class="loading">
+    <div id="viewport">
+      <div id="emulator" class="padding scrollbars">
+        <div id="canvas-container">
+          <canvas id="canvas" tabindex="0" width="640" height="480"></canvas>
+        </div>
+        <div class="controls border-t border-b margin-t hidden">
+          <button class="btn toggle-fps">Toggle FPS</button>
+          <button class="btn code-stop" onclick="code_stop()"><icon class="fa-solid fa-stop"></icon>Stop</button>
+        </div>
+        <div class="output margin-t hidden"></div>
+      </div>
+      <div id="assembler" class="scrollbars">
+        <div class="log" id="log">Ready to assemble...</div>
+        <pre id="hex-view">Hex view will appear here.</pre>
+      </div>
+      <div id="listing" class="scrollbars">
+        <pre id="list-view">Listing will appear here.</pre>
+      </div>
+    </div>
+
+    <script src="js/playground.js"></script>
+    <script src="js/emulator.js"></script>
+    <script src="js/assembler.js"></script>
+
+    <script src="wasm/native/zeal.elf.js"></script>
+    <script src="wasm/gnu-as/as.js"></script>
+    <script src="wasm/gnu-as/ld.js"></script>
+    <script src="wasm/gnu-as/objcopy.js"></script>
+    <script src="wasm/gnu-as/toolchain.js"></script>
+  </body>
+</html>

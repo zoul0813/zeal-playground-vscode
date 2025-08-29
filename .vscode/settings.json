@@ -1,0 +1,28 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "workbench.editorAssociations": {
+    "*.ztp": "hexEditor.hexedit",
+    "*.zts": "hexEditor.hexedit",
+    "*.ztm": "hexEditor.hexedit",
+    "*.bin": "hexEditor.hexedit"
+  },
+  "[css]": {
+    "editor.foldingStrategy": "indentation",
+    "editor.detectIndentation": false,
+    "editor.tabSize": 4
+  },
+  "[html]": {
+    "editor.foldingStrategy": "indentation",
+    "editor.detectIndentation": false,
+    "editor.tabSize": 2
+  },
+  "[javascript]": {
+    "editor.foldingStrategy": "indentation",
+    "editor.detectIndentation": false,
+    "editor.tabSize": 2
+  },
+  "[z80-macroasm]": {
+    "files.insertFinalNewline": true
+  }
+}
