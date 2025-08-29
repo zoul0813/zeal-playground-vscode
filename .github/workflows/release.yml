@@ -14,60 +14,60 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Install vsce
-      run: npm install -g @vscode/vsce
-      
-    - name: Compile extension
-      run: npm run compile
-      
-    - name: Package extension
-      run: vsce package
-      
-    - name: Get version from package.json
-      id: package-version
-      run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-      
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref_name || github.event.inputs.version }}
-        release_name: Release ${{ github.ref_name || github.event.inputs.version }}
-        body: |
-          Release ${{ github.ref_name || github.event.inputs.version }} of Zeal 8-bit Emulator Preview VS Code Extension
-          
-          ## Changes
-          - See commit history for detailed changes
-          
-          ## Installation
-          Download the `.vsix` file and install it in VS Code using:
-          - Command Palette: `Extensions: Install from VSIX...`
-          - Or drag and drop the file into the Extensions view
-        draft: false
-        prerelease: false
-        
-    - name: Upload VSIX to Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./zeal-8bit-preview-${{ steps.package-version.outputs.version }}.vsix
-        asset_name: zeal-8bit-preview-${{ steps.package-version.outputs.version }}.vsix
-        asset_content_type: application/zip
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: Compile extension
+        run: npm run compile
+
+      - name: Package extension
+        run: vsce package
+
+      - name: Get version from package.json
+        id: package-version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name || github.event.inputs.version }}
+          release_name: Release ${{ github.ref_name || github.event.inputs.version }}
+          body: |
+            Release ${{ github.ref_name || github.event.inputs.version }} of Zeal 8-bit Emulator Preview VS Code Extension
+
+            ## Changes
+            - See commit history for detailed changes
+
+            ## Installation
+            Download the `.vsix` file and install it in VS Code using:
+            - Command Palette: `Extensions: Install from VSIX...`
+            - Or drag and drop the file into the Extensions view
+          draft: false
+          prerelease: false
+
+      - name: Upload VSIX to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./zeal-8bit-preview-${{ steps.package-version.outputs.version }}.vsix
+          asset_name: zeal-8bit-preview-${{ steps.package-version.outputs.version }}.vsix
+          asset_content_type: application/zip
