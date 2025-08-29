@@ -157,6 +157,7 @@ class ZealPreviewPanel {
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,
+        retainContextWhenHidden: true,
         localResourceRoots: [
           vscode.Uri.joinPath(extensionUri, 'playground', 'js'),
           vscode.Uri.joinPath(extensionUri, 'playground', 'css'),
