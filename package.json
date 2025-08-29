@@ -1,0 +1,78 @@
+{
+  "name": "zeal-8bit-preview",
+  "displayName": "Zeal 8-bit Emulator Preview",
+  "description": "Preview Zeal 8-bit binaries in an emulator panel",
+  "version": "0.0.1",
+  "publisher": "zeal8bit",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Debuggers"
+  ],
+  "keywords": [
+    "zeal",
+    "8bit",
+    "emulator",
+    "assembly",
+    "z80"
+  ],
+  "activationEvents": [
+    "onCommand:zeal8bit.openPreview",
+    "onTaskType:shell"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "zeal8bit.openPreview",
+        "title": "Open Zeal 8-bit Preview",
+        "category": "Zeal 8-bit",
+        "icon": "$(device-desktop)"
+      },
+      {
+        "command": "zeal8bit.loadBinary",
+        "title": "Load Binary in Zeal 8-bit Preview",
+        "category": "Zeal 8-bit",
+        "icon": "$(play)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "zeal8bit.loadBinary",
+          "when": "resourceExtname == .bin",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "zeal8bit.openPreview"
+        },
+        {
+          "command": "zeal8bit.loadBinary",
+          "when": "false"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "typescript": "^4.9.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zeal8bit/Zeal-Playground-VSCode.git"
+  },
+  "license": "MIT"
+}

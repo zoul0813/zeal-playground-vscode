@@ -35,6 +35,17 @@ async function download_binary() {
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('document', 'load');
+
+  // Check if we're running in VS Code webview
+  if (window.IS_VSCODE_EXTENSION || typeof acquireVsCodeApi !== 'undefined') {
+    // Running in VS Code extension - wait for binary to be loaded via message
+    console.log('Running in VS Code extension context - waiting for binary load message');
+    document.body.classList.remove('loading');
+    return;
+  }
+
+  // Original behavior for standalone version
+  console.log('Running in standalone mode - loading sprites_move.bin');
   fetch('sprites_move.bin')
     .then(async (response) => {
       if (!response.ok) throw 'invalid response';
