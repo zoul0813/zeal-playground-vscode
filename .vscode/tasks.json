@@ -7,10 +7,20 @@
       "script": "compile",
       "group": "build",
       "presentation": {
-        "panel": "dedicated",
-        "reveal": "never"
+        "panel": "shared",
+        "reveal": "always"
       },
       "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "vsce: package",
+      "type": "shell",
+      "command": "vsce package",
+      "group": "build",
+      "presentation": {
+        "panel": "shared",
+        "reveal": "always"
+      }
     }
   ]
 }

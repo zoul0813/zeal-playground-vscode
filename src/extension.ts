@@ -40,8 +40,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  const buildCommand = vscode.commands.registerCommand('zeal8bit.zde_cmake', async () => {
-    await zde_build();
+  const cmakeCommand = vscode.commands.registerCommand('zeal8bit.zde_cmake', async () => {
+    await zde_build('cmake');
+    await handleBuildTaskComplete({} as vscode.Task);
+  });
+
+  const makeCommand = vscode.commands.registerCommand('zeal8bit.zde_make', async () => {
+    await zde_build('make');
     await handleBuildTaskComplete({} as vscode.Task);
   });
 
@@ -62,7 +67,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     openPreviewCommand,
     loadBinaryCommand,
-    buildCommand,
+    cmakeCommand,
     taskEndListener,
     configChangeListener,
   );

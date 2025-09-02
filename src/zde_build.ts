@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { spawn } from 'child_process';
+import stripAnsi from 'strip-ansi';
 
-export async function zde_build(type = 'cmake'): Promise<number> {
+export async function zde_build(type = 'cmake', ...options: string[]): Promise<number> {
   console.log('Running `zde cmake` in project root');
 
   const outputChannel = vscode.window.createOutputChannel('zeal8bit.zde_cmake');
@@ -11,7 +12,7 @@ export async function zde_build(type = 'cmake'): Promise<number> {
   outputChannel.show(true);
 
   const cmd = 'zde';
-  const args = ['cmake'];
+  const args = [type, ...options];
   const cwd = vscode.workspace.rootPath || process.cwd();
 
   outputChannel.appendLine(`Running build: ${cmd} ${args.join(' ')}\n`);
@@ -20,11 +21,11 @@ export async function zde_build(type = 'cmake'): Promise<number> {
     const child = spawn(cmd, args, { cwd, shell: true });
 
     child.stdout.on('data', (data) => {
-      outputChannel.append(data.toString());
+      outputChannel.append(stripAnsi(data.toString()));
     });
 
     child.stderr.on('data', (data) => {
-      outputChannel.append(data.toString());
+      outputChannel.append(stripAnsi(data.toString()));
     });
 
     child.on('close', (code) => {

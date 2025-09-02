@@ -2,7 +2,7 @@
   "name": "zeal-8bit-preview",
   "displayName": "Zeal 8-bit Emulator Preview",
   "description": "Preview Zeal 8-bit binaries in an emulator panel",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "zeal8bit",
   "engines": {
     "vscode": "^1.74.0"
@@ -40,6 +40,12 @@
       {
         "command": "zeal8bit.zde_cmake",
         "title": "Run CMake in ZDE",
+        "category": "Zeal 8-bit",
+        "icon": "$(wrench)"
+      },
+      {
+        "command": "zeal8bit.zde_make",
+        "title": "Run Make in ZDE",
         "category": "Zeal 8-bit",
         "icon": "$(wrench)"
       }
@@ -89,13 +95,16 @@
     "release:prerelease": "npm version prerelease"
   },
   "devDependencies": {
-    "@types/vscode": "^1.74.0",
     "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
     "typescript": "^4.9.4"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/Zeal8bit/Zeal-Playground-VSCode.git"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "strip-ansi": "^7.1.0"
+  }
 }
