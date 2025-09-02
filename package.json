@@ -36,6 +36,12 @@
         "title": "Load Binary in Zeal 8-bit Preview",
         "category": "Zeal 8-bit",
         "icon": "$(play)"
+      },
+      {
+        "command": "zeal8bit.zde_cmake",
+        "title": "Run CMake in ZDE",
+        "category": "Zeal 8-bit",
+        "icon": "$(wrench)"
       }
     ],
     "menus": {
