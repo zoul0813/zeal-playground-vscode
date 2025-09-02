@@ -2,7 +2,7 @@
   "name": "zeal-8bit-preview",
   "displayName": "Zeal 8-bit Emulator Preview",
   "description": "Preview Zeal 8-bit binaries in an emulator panel",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "zeal8bit",
   "engines": {
     "vscode": "^1.74.0"
