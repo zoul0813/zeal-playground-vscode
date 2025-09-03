@@ -4,6 +4,8 @@ import * as fs from 'fs';
 import { zde_build } from './zde_build';
 import { getZeal8bitConfig } from './config';
 import { ZealPreviewPanel } from './preview';
+import { MenuDataProvider } from './panels/menu';
+import { zde_setup_env } from './environment';
 
 const EXTENSION_ID = 'zeal8bit.zeal-8bit-preview';
 
@@ -13,6 +15,8 @@ export function activate(context: vscode.ExtensionContext) {
   // Log current configuration
   const config = getZeal8bitConfig();
   console.log('Zeal 8-bit configuration:', config);
+
+  zde_setup_env(context);
 
   // Listen for configuration changes
   const configChangeListener = vscode.workspace.onDidChangeConfiguration((e) => {
@@ -28,26 +32,30 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   // Register command to open preview
-  const openPreviewCommand = vscode.commands.registerCommand('zeal8bit.openPreview', () => {
+  const cmdPreviewOpen = vscode.commands.registerCommand('zeal8bit.preview.open', () => {
     ZealPreviewPanel.createOrShow(context.extensionUri);
   });
 
   // Register command to load binary
-  const loadBinaryCommand = vscode.commands.registerCommand('zeal8bit.loadBinary', (uri: vscode.Uri) => {
+  const cmdPreviewLoad = vscode.commands.registerCommand('zeal8bit.preview.load', (uri: vscode.Uri) => {
     if (uri && uri.fsPath.endsWith('.bin')) {
       ZealPreviewPanel.createOrShow(context.extensionUri);
       ZealPreviewPanel.currentPanel?.loadBinary(uri.fsPath);
     }
   });
 
-  const cmakeCommand = vscode.commands.registerCommand('zeal8bit.zde_cmake', async () => {
+  const cmdZDECMake = vscode.commands.registerCommand('zeal8bit.zde.cmake', async () => {
     await zde_build('cmake');
     await handleBuildTaskComplete({} as vscode.Task);
   });
 
-  const makeCommand = vscode.commands.registerCommand('zeal8bit.zde_make', async () => {
+  const cmdZDEMake = vscode.commands.registerCommand('zeal8bit.zde.make', async () => {
     await zde_build('make');
     await handleBuildTaskComplete({} as vscode.Task);
+  });
+
+  const cmdReload = vscode.commands.registerCommand('zeal8bit.reload', async () => {
+    zde_setup_env(context);
   });
 
   // Listen for task completion
@@ -64,10 +72,17 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
+  const treeViewProvider = new MenuDataProvider();
+  vscode.window.createTreeView('zeal8bit-menu', {
+    treeDataProvider: treeViewProvider,
+  });
+
   context.subscriptions.push(
-    openPreviewCommand,
-    loadBinaryCommand,
-    cmakeCommand,
+    cmdPreviewOpen,
+    cmdPreviewLoad,
+    cmdZDECMake,
+    cmdZDEMake,
+    cmdReload,
     taskEndListener,
     configChangeListener,
   );

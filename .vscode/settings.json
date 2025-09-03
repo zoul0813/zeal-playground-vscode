@@ -5,7 +5,8 @@
     "*.ztp": "hexEditor.hexedit",
     "*.zts": "hexEditor.hexedit",
     "*.ztm": "hexEditor.hexedit",
-    "*.bin": "hexEditor.hexedit"
+    "*.bin": "hexEditor.hexedit",
+    "*.svg": "default"
   },
   "[css]": {
     "editor.foldingStrategy": "indentation",

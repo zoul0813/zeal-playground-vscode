@@ -1,9 +1,9 @@
 {
-  "name": "zeal-8bit-preview",
+  "name": "zeal8bit",
   "displayName": "Zeal 8-bit Emulator Preview",
   "description": "Preview Zeal 8-bit binaries in an emulator panel",
   "version": "0.1.1",
-  "publisher": "zeal8bit",
+  "publisher": "zoul0813",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -12,58 +12,102 @@
     "Debuggers"
   ],
   "keywords": [
-    "zeal",
-    "8bit",
+    "zeal8bit",
+    "z80",
     "emulator",
-    "assembly",
-    "z80"
+    "assembly"
   ],
   "activationEvents": [
-    "onCommand:zeal8bit.openPreview",
+    "onCommand:zeal8bit.preview.open",
     "onTaskType:shell"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "zeal8bit.openPreview",
+        "command": "zeal8bit.preview.open",
         "title": "Open Zeal 8-bit Preview",
         "category": "Zeal 8-bit",
         "icon": "$(device-desktop)"
       },
       {
-        "command": "zeal8bit.loadBinary",
+        "command": "zeal8bit.preview.load",
         "title": "Load Binary in Zeal 8-bit Preview",
         "category": "Zeal 8-bit",
         "icon": "$(play)"
       },
       {
-        "command": "zeal8bit.zde_cmake",
+        "command": "zeal8bit.zde.cmake",
         "title": "Run CMake in ZDE",
         "category": "Zeal 8-bit",
         "icon": "$(wrench)"
       },
       {
-        "command": "zeal8bit.zde_make",
+        "command": "zeal8bit.zde.make",
         "title": "Run Make in ZDE",
+        "category": "Zeal 8-bit",
+        "icon": "$(wrench)"
+      },
+      {
+        "command": "zeal8bit.kernel.compile",
+        "title": "Compile Zeal Kernel",
+        "category": "Zeal 8-bit",
+        "icon": "$(wrench)"
+      },
+      {
+        "command": "zeal8bit.hardware.xfer",
+        "title": "Xfer to Hardware",
+        "category": "Zeal 8-bit",
+        "icon": "$(play)"
+      },
+      {
+        "command": "zeal8bit.emulator.run",
+        "title": "Run Zeal Native Emulator",
+        "category": "Zeal 8-bit",
+        "icon": "$(wrench)"
+      },
+      {
+        "command": "zeal8bit.reload",
+        "title": "Reload Zeal 8-bit Extension",
         "category": "Zeal 8-bit",
         "icon": "$(wrench)"
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "zeal8bit-sidebar",
+          "title": "Zeal 8-bit",
+          "icon": "logo.svg"
+        }
+      ]
+    },
+    "views": {
+      "zeal8bit-sidebar": [
+        {
+          "id": "zeal8bit-menu",
+          "name": "Overview"
+        },
+        {
+          "id": "zeal8bit-secondView",
+          "name": "Details"
+        }
+      ]
+    },
     "menus": {
       "explorer/context": [
         {
-          "command": "zeal8bit.loadBinary",
+          "command": "zeal8bit.preview.load",
           "when": "resourceExtname == .bin",
           "group": "navigation"
         }
       ],
       "commandPalette": [
         {
-          "command": "zeal8bit.openPreview"
+          "command": "zeal8bit.preview.open"
         },
         {
-          "command": "zeal8bit.loadBinary",
+          "command": "zeal8bit.preview.load",
           "when": "false"
         }
       ]

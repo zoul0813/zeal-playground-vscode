@@ -61,8 +61,14 @@ For more details, see [CONFIGURATION.md](CONFIGURATION.md).
 
 ## Commands
 
-- `zeal8bit.openPreview` - Open the Zeal 8-bit preview panel
-- `zeal8bit.loadBinary` - Load a binary file into the preview
+- `zeal8bit.preview.open` - Open Zeal 8-bit Preview
+- `zeal8bit.preview.load` - Load Binary in Zeal 8-bit Preview
+- `zeal8bit.zde.cmake` - Run CMake in ZDE
+- `zeal8bit.zde.make` - Run Make in ZDE
+- `zeal8bit.kernel.compile` - Compile Zeal Kernel
+- `zeal8bit.hardware.xfer` - Xfer to Hardware
+- `zeal8bit.emulator.run` - Run Zeal Native Emulator
+- `zeal8bit.reload` -Reload Zeal 8-bit Extension
 
 ## Requirements
 
