@@ -7,7 +7,20 @@ import { ZealPreviewPanel } from './preview';
 import { MenuDataProvider } from './panels/menu';
 import { zde_setup_env } from './environment';
 
-const EXTENSION_ID = 'zeal8bit.zeal-8bit-preview';
+const EXTENSION_ID = 'zeal8bit.zeal8bit';
+
+export function getExtensionRootUri(): vscode.Uri {
+  const extension = vscode.extensions.getExtension(EXTENSION_ID);
+  if (extension) {
+    // Installed extension
+    return extension.extensionUri;
+  }
+
+  // Development/debug mode
+  // __dirname might be .../my-extension/out
+  // Go up one level to get the root of the extension
+  return vscode.Uri.file(path.join(__dirname, '..'));
+}
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('Zeal 8-bit Preview extension is now active!');
@@ -33,13 +46,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Register command to open preview
   const cmdPreviewOpen = vscode.commands.registerCommand('zeal8bit.preview.open', () => {
-    ZealPreviewPanel.createOrShow(context.extensionUri);
+    ZealPreviewPanel.createOrShow();
   });
 
   // Register command to load binary
   const cmdPreviewLoad = vscode.commands.registerCommand('zeal8bit.preview.load', (uri: vscode.Uri) => {
     if (uri && uri.fsPath.endsWith('.bin')) {
-      ZealPreviewPanel.createOrShow(context.extensionUri);
+      ZealPreviewPanel.createOrShow();
       ZealPreviewPanel.currentPanel?.loadBinary(uri.fsPath);
     }
   });
@@ -146,12 +159,10 @@ async function handleBuildTaskComplete(task: vscode.Task) {
         'Dismiss',
       );
       if (action === 'Open in Zeal 8-bit Preview') {
-        const extensionUri =
-          vscode.extensions.getExtension(EXTENSION_ID)?.extensionUri || vscode.Uri.file(path.dirname(__filename));
-        ZealPreviewPanel.createOrShow(extensionUri);
+        ZealPreviewPanel.createOrShow();
         setTimeout(() => {
           ZealPreviewPanel.currentPanel?.loadBinary(newestBinary);
-        }, 1000);
+        }, 500);
       }
     }
   }

@@ -2,17 +2,18 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { getZeal8bitConfig } from './config';
+import { getExtensionRootUri } from './extension';
 
 export class ZealPreviewPanel {
   public static currentPanel: ZealPreviewPanel | undefined;
   public static readonly viewType = 'zeal8bitPreview';
 
   private readonly _panel: vscode.WebviewPanel;
-  private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
   private _config: ReturnType<typeof getZeal8bitConfig>;
 
-  public static createOrShow(extensionUri: vscode.Uri) {
+  public static createOrShow() {
+    const extensionUri = getExtensionRootUri();
     const column = vscode.window.activeTextEditor ? vscode.ViewColumn.Beside : undefined;
 
     if (ZealPreviewPanel.currentPanel) {
@@ -37,12 +38,11 @@ export class ZealPreviewPanel {
       },
     );
 
-    ZealPreviewPanel.currentPanel = new ZealPreviewPanel(panel, extensionUri);
+    ZealPreviewPanel.currentPanel = new ZealPreviewPanel(panel);
   }
 
-  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+  private constructor(panel: vscode.WebviewPanel) {
     this._panel = panel;
-    this._extensionUri = extensionUri;
     this._config = getZeal8bitConfig();
 
     console.log('ZealPreviewPanel created with config:', this._config);
@@ -96,11 +96,12 @@ export class ZealPreviewPanel {
 
   private _update() {
     const webview = this._panel.webview;
-    this._panel.webview.html = this._getHtmlForWebview(webview, this._extensionUri);
+    this._panel.webview.html = this._getHtmlForWebview(webview);
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview, extensionUri: vscode.Uri) {
+  private _getHtmlForWebview(webview: vscode.Webview) {
     // Get URIs for all the resources
+    const extensionUri = getExtensionRootUri();
     const paths: Record<string, vscode.Uri> = {
       playgroundJs: vscode.Uri.joinPath(extensionUri, 'playground', 'js', 'playground.js'),
       vscodeJs: vscode.Uri.joinPath(extensionUri, 'playground', 'js', 'vscode.js'),
