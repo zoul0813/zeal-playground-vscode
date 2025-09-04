@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { getZeal8bitConfig } from './config';
+import { ZealConfig, ZealConfiguration } from './config';
 import { getExtensionRootUri } from './extension';
 
 export class ZealPreviewPanel {
@@ -10,7 +10,24 @@ export class ZealPreviewPanel {
 
   private readonly _panel: vscode.WebviewPanel;
   private _disposables: vscode.Disposable[] = [];
-  private _config: ReturnType<typeof getZeal8bitConfig>;
+  private _config: ZealConfiguration;
+
+  public static activate(context: vscode.ExtensionContext) {
+    // Register command to open preview
+    const cmdPreviewOpen = vscode.commands.registerCommand('zeal8bit.preview.open', () => {
+      ZealPreviewPanel.createOrShow();
+    });
+
+    // Register command to load binary
+    const cmdPreviewLoad = vscode.commands.registerCommand('zeal8bit.preview.load', (uri: vscode.Uri) => {
+      if (uri && uri.fsPath.endsWith('.bin')) {
+        ZealPreviewPanel.createOrShow();
+        ZealPreviewPanel.currentPanel?.loadBinary(uri.fsPath);
+      }
+    });
+
+    context.subscriptions.push(cmdPreviewOpen, cmdPreviewLoad);
+  }
 
   public static createOrShow() {
     const extensionUri = getExtensionRootUri();
@@ -19,7 +36,7 @@ export class ZealPreviewPanel {
     if (ZealPreviewPanel.currentPanel) {
       ZealPreviewPanel.currentPanel._panel.reveal(column);
       // Update configuration in existing panel
-      ZealPreviewPanel.currentPanel._config = getZeal8bitConfig();
+      ZealPreviewPanel.currentPanel._config = ZealConfig.get();
       return;
     }
 
@@ -43,7 +60,7 @@ export class ZealPreviewPanel {
 
   private constructor(panel: vscode.WebviewPanel) {
     this._panel = panel;
-    this._config = getZeal8bitConfig();
+    this._config = ZealConfig.get();
 
     console.log('ZealPreviewPanel created with config:', this._config);
 
@@ -71,7 +88,7 @@ export class ZealPreviewPanel {
   }
 
   public updateConfig() {
-    this._config = getZeal8bitConfig();
+    this._config = ZealConfig.get();
     console.log('ZealPreviewPanel config updated:', this._config);
 
     // Send updated config to webview

@@ -7,19 +7,32 @@ export async function zde_setup_env(context: vscode.ExtensionContext) {
       vscode.window.showErrorMessage('ZDE_PATH is not set');
       return reject('ZDE_PATH is not set');
     }
-    exec(`bash -c "source $ZDE_PATH/bin/activate && env"`, async (err, stdout) => {
+    exec(`bash -c "$ZDE_PATH/bin/activate"`, async (err, stdout) => {
       if (err) {
         vscode.window.showErrorMessage('Failed to load ZDE environment');
         reject('Failed to load ZDE environment');
       }
 
       const env = context.environmentVariableCollection;
+
       stdout.split('\n').forEach((line) => {
-        const [key, ...rest] = line.split('=');
-        if (key) {
-          process.env[key] = rest.join('=');
-          env.replace(key, rest.join('='));
+        // split into key=value
+        const [, assignment = ''] = line.split('export ');
+        let [key, value = ''] = assignment.split('=');
+        if (!value.trim()) return;
+
+        // remove surrounding quotes if present
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.slice(1, -1);
         }
+
+        // expand variables like $ZDE_HOME, $PATH, etc.
+        value = value.replace(/\$([A-Za-z_]\w*)/g, (_, varName) => {
+          return process.env[varName] ?? '';
+        });
+
+        process.env[key] = value;
+        env.replace(key, value);
       });
 
       const cppExt = vscode.extensions.getExtension('ms-vscode.cpptools');

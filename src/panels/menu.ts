@@ -1,5 +1,13 @@
 import * as vscode from 'vscode';
 
+export class ZealMenu {
+  public static activate(context: vscode.ExtensionContext) {
+    const treeViewProvider = new MenuDataProvider();
+    vscode.window.createTreeView('zeal8bit-menu', {
+      treeDataProvider: treeViewProvider,
+    });
+  }
+}
 export class MenuDataProvider implements vscode.TreeDataProvider<vscode.Command> {
   private _onDidChangeTreeData: vscode.EventEmitter<vscode.Command | undefined | void> = new vscode.EventEmitter<
     vscode.Command | undefined | void
