@@ -42,7 +42,7 @@ export class ZealPreviewPanel {
 
     const panel = vscode.window.createWebviewPanel(
       ZealPreviewPanel.viewType,
-      'Zeal 8-bit Preview',
+      'Zeal 8-bit - Preview',
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,

@@ -24,6 +24,10 @@ export class MenuDataProvider implements vscode.TreeDataProvider<vscode.Command>
     if (!element) {
       return Promise.resolve([
         {
+          command: 'zeal8bit.project.create',
+          title: 'Create Project',
+        },
+        {
           command: 'zeal8bit.preview.open',
           title: 'Open Preview',
         },

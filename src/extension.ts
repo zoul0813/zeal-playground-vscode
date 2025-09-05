@@ -7,6 +7,7 @@ import { ZealConfig } from './config';
 import { ZDE } from './zde';
 import { ZealBuild } from './build';
 import { ZealKernel } from './kernel';
+import { ZealProject } from './panels/project';
 
 const EXTENSION_ID = 'zeal8bit.zeal8bit';
 
@@ -38,6 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
   ZDE.activate(context);
   ZealKernel.activate(context);
   ZealMenu.activate(context);
+  ZealProject.activate(context);
 
   const cmdReload = vscode.commands.registerCommand('zeal8bit.reload', async () => {
     zde_setup_env(context);

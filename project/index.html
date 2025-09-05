@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zeal 8-bit Preview</title>
+    <link rel="stylesheet" href="${projectCss}" />
+    <style>
+      body {
+        background-color: var(--vscode-editor-background, #1e1e1e);
+        color: var(--vscode-editor-foreground, #d4d4d4);
+        font-family: var(--vscode-font-family);
+      }
+      .loading-message {
+        text-align: center;
+        padding: 20px;
+        font-family: var(--vscode-font-family);
+        color: var(--vscode-foreground);
+      }
+    </style>
+    <script>
+      window.projectRoot = '${projectRoot}';
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Create Project</h2>
+      <div class="form">
+        <label>
+          Project Name
+          <input type="text" id="name" placeholder="my-project" />
+        </label>
+        <label>
+          Template
+          <select id="template">
+            <!-- <option value="blank">Blank</option> -->
+            <option value="zealos">Zeal OS - Hello World</option>
+            <option value="zgdk">ZGDK - Simple</option>
+          </select>
+        </label>
+        <label>
+          Type
+          <select id="type">
+            <option value="c">Zeal 8-bit Zeal OS</option>
+            <option value="cpp">Zeal 8-bit - Bare Metal</option>
+          </select>
+        </label>
+        <label>
+          Destination Folder
+          <input type="text" id="destination" placeholder="/path/to/folder" />
+        </label>
+        <div class="buttons">
+          <button id="btn-cancel">Cancel</button>
+          <button id="btn-create" class="primary">Create</button>
+        </div>
+      </div>
+    </div>
+    <script src="${projectJs}"></script>
+  </body>
+</html>

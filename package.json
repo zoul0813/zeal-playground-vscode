@@ -25,6 +25,12 @@
   "contributes": {
     "commands": [
       {
+        "command": "zeal8bit.project.create",
+        "title": "Create Zeal 8-bit Project",
+        "category": "Zeal 8-bit",
+        "icon": "$(device-desktop)"
+      },
+      {
         "command": "zeal8bit.preview.open",
         "title": "Open Zeal 8-bit Preview",
         "category": "Zeal 8-bit",
@@ -118,8 +124,14 @@
         "zeal8bit.uses": {
           "type": "string",
           "default": "",
-          "description": "Custom property to define what the project uses. Can be used for project-specific settings.",
-          "scope": "resource"
+          "description": "Whether the Preview Emulator loads Zeal OS or runs your program as Bare Metal.",
+          "scope": "window"
+        },
+        "zeal8bit.projectRoot": {
+          "type": "string",
+          "default": "",
+          "description": "Default location of your Zeal 8-bit Projects, defaults to ~/Documents.",
+          "scope": "machine"
         }
       }
     }
