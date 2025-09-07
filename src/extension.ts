@@ -39,6 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   const cmdReload = vscode.commands.registerCommand('zeal8bit.reload', async () => {
     zde_setup_env(extensionContext);
+    vscode.commands.executeCommand('workbench.action.reloadWindow');
   });
 
   extensionContext.subscriptions.push(cmdReload);
