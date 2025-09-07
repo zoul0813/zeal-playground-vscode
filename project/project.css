@@ -1,3 +1,46 @@
+/*
+
+🎨 Background
+--vscode-input-background → input background color
+--vscode-input-foreground → input text color
+--vscode-input-placeholderForeground → placeholder text color
+
+🖊 Foreground
+--vscode-input-foreground → text color
+--vscode-input-placeholderForeground → placeholder
+
+📦 Borders
+--vscode-input-border → input border
+--vscode-focusBorder → border when focused
+
+🚫 Disabled state
+--vscode-disabledForeground → text color when disabled
+--vscode-inputOption-disabledBackground → disabled background (dropdowns/options)
+
+🟢 Validation states
+--vscode-inputValidation-infoBackground
+--vscode-inputValidation-infoBorder
+--vscode-inputValidation-warningBackground
+--vscode-inputValidation-warningBorder
+--vscode-inputValidation-errorBackground
+--vscode-inputValidation-errorBorder
+
+🎨 Button colors
+Primary button
+--vscode-button-background → background color
+--vscode-button-foreground → text color
+--vscode-button-hoverBackground → background on hover
+
+Secondary button
+--vscode-button-secondaryBackground → background color
+--vscode-button-secondaryForeground → text color
+--vscode-button-secondaryHoverBackground → background on hover
+
+Disabled button
+--vscode-button-disabledBackground → background color when disabled
+--vscode-button-disabledForeground → text color when disabled
+
+*/
 body {
     padding: 24px;
 }
@@ -32,17 +75,17 @@ label {
 input,
 select {
     padding: .5ch 2ch;
-    background-color: #2d2d2d;
-    border: 1px solid #6c6c6c;
+    background-color: var(--vscode-input-background, #2d2d2d);
+    border: 1px solid var(--vscode-input-border, #6c6c6c);
     border-radius: 4px;
-    color: #989898;
+    color: var(--vscode-input-foreground, #989898);
 }
 
 button {
-    background-color: #181818;
-    color: #989898;
+    background-color: var(--vscode-button-secondaryBackground, #181818);
+    color: var(--vscode-button-secondaryForeground, #989898);
+    border: 1px solid transparent;
     border-radius: 4px;
-    border: 1px solid #6c6c6c;
     box-shadow: 0 2px 0 rgba(0, 0, 0, .015);
     padding: 0 16px;
     line-height: 1.499;
@@ -52,9 +95,17 @@ button {
     white-space: nowrap;
     cursor: pointer;
 
+    &:hover {
+        background-color: var(--vscode-button-secondaryHoverBackground, #181818);
+    }
+
     &.primary {
-        background-color: #68a1de;
-        border-color: #68a1de;
-        color: #fff;
+        background-color: var(--vscode-button-background, #68a1de);
+        color: var(--vscode-button-foreground, #fff);
+        border: 1px solid transparent;
+
+        &:hover {
+            background-color: var(--vscode-button-hoverBackground, #181818);
+        }
     }
 }

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ZealConfig, ZealConfiguration } from './config';
-import { getExtensionRootUri } from './extension';
+import { getExtensionRootUri } from './paths';
 
 export class ZealPreviewPanel {
   public static currentPanel: ZealPreviewPanel | undefined;

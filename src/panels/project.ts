@@ -2,8 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ZealConfig, ZealConfiguration } from '../config';
-import { getExtensionRootUri } from '../extension';
-import { getProjectRoot, openProjectFolder } from '../paths';
+import { getExtensionRootUri, getProjectRoot, openProjectFolder } from '../paths';
 import { ZDE } from '../zde';
 
 export class ZealProject {

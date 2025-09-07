@@ -1,5 +1,8 @@
 import * as vscode from 'vscode';
 import { exec } from 'child_process';
+import { EXTENSION_ID } from './paths';
+
+export const EXTENSION_INITIALIZED = `${EXTENSION_ID}_INITIALIZED`.replace('.', '_');
 
 export async function zde_setup_env(context: vscode.ExtensionContext) {
   return new Promise((resolve, reject) => {
@@ -37,15 +40,6 @@ export async function zde_setup_env(context: vscode.ExtensionContext) {
 
       const cppExt = vscode.extensions.getExtension('ms-vscode.cpptools');
       if (cppExt) await cppExt.activate();
-
-      const alreadyReloaded = context.workspaceState.get<boolean>('zde_env_reloaded', false);
-      if (!alreadyReloaded) {
-        await context.workspaceState.update('zde_env_reloaded', true);
-        vscode.commands.executeCommand('workbench.action.reloadWindow');
-      } else {
-        await context.workspaceState.update('zde_env_reloaded', false);
-        vscode.window.showInformationMessage('ZDE environment loaded.');
-      }
 
       resolve(true);
     });

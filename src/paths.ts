@@ -3,6 +3,21 @@ import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 
+export const EXTENSION_ID = 'zoul0813.zeal8bit';
+
+export function getExtensionRootUri(): vscode.Uri {
+  const extension = vscode.extensions.getExtension(EXTENSION_ID);
+  if (extension) {
+    // Installed extension
+    return extension.extensionUri;
+  }
+
+  // Development/debug mode
+  // __dirname might be .../my-extension/out
+  // Go up one level to get the root of the extension
+  return vscode.Uri.file(path.join(__dirname, '..'));
+}
+
 export function getProjectRoot(): string {
   const config = vscode.workspace.getConfiguration('zeal8bit');
   let projectRoot = config.get<string>('projectRoot');
