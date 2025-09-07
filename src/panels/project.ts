@@ -9,6 +9,7 @@ import { ZDE } from '../zde';
 export class ZealProject {
   public static currentPanel: ZealProject | undefined;
   public static readonly viewType = 'zeal8bitPreview';
+  public static templates: string[] = [];
 
   private readonly _panel: vscode.WebviewPanel;
   private _disposables: vscode.Disposable[] = [];
@@ -79,7 +80,7 @@ export class ZealProject {
         );
         // TODO: actually create the project
 
-        await ZDE.exec('create', destination, template, `name=${name}`);
+        await ZDE.exec('create', { cwd: destination }, template, `name=${name}`);
         await openProjectFolder(path.join(destination, name));
 
         this.dispose();
@@ -105,7 +106,23 @@ export class ZealProject {
 
   private _update() {
     const webview = this._panel.webview;
-    this._panel.webview.html = this._getHtmlForWebview(webview);
+
+    ZDE.exec('create', { suppress: true }, '-t')
+      .then((result) => {
+        const output = result.output;
+        console.log('output', output);
+        ZealProject.templates = [];
+        output.split(`\n`).forEach((line) => {
+          console.log('line', line);
+          if (line.startsWith('template: ')) {
+            const [_, template] = line.split('template: ');
+            ZealProject.templates.push(template);
+          }
+        });
+      })
+      .then(() => {
+        this._panel.webview.html = this._getHtmlForWebview(webview);
+      });
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
@@ -115,6 +132,7 @@ export class ZealProject {
       projectJs: vscode.Uri.joinPath(extensionUri, 'project', 'project.js'),
       projectCss: vscode.Uri.joinPath(extensionUri, 'project', 'project.css'),
       projectRoot: getProjectRoot(),
+      templates: JSON.stringify(ZealProject.templates),
     };
 
     const htmlPath = path.join(extensionUri.fsPath, 'project', 'index.html');
@@ -136,7 +154,7 @@ export class ZealProject {
       return `<link rel="stylesheet" href="${replaceAssetPath(href)}" />`;
     });
 
-    html = html.replace(/(window\.\w+\s*=\s*')\$\{(.+?)\}(';)/g, (match, before, src, after) => {
+    html = html.replace(/(window\.\w+\s*=\s*'?)\$\{(.+?)\}('?;)/g, (match, before, src, after) => {
       return `${before}${replaceAssetPath(src)}${after}`;
     });
 

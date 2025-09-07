@@ -28,4 +28,15 @@ window.addEventListener('load', () => {
   if (destination) {
     destination.placeholder = window.projectRoot;
   }
+
+  const template = document.getElementById('template');
+  if (template) {
+    template.innerHTML = ''; // clear the error option
+    (window.templates ?? []).forEach((type) => {
+      const option = document.createElement('option');
+      option.value = type;
+      option.textContent = type;
+      template.appendChild(option);
+    });
+  }
 });
